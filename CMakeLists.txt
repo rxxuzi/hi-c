@@ -15,6 +15,7 @@ add_executable(hi-c
         src/path/path.c
         src/util/io.c
         src/size/size.c
+        src/stat/stat.c
 )
 
 set_target_properties(hi-c PROPERTIES

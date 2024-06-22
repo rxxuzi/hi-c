@@ -14,6 +14,22 @@ static void del() {
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
+HANDLE console;
+COORD initialPosition;
+
+void initCursorPosition() {
+    console = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+
+    if (GetConsoleScreenBufferInfo(console, &csbi)) {
+        initialPosition = csbi.dwCursorPosition;
+    }
+}
+
+void resetCursorPosition() {
+    SetConsoleCursorPosition(console, initialPosition);
+}
+
 void c_R(const char *format, ...) {
     set(FOREGROUND_RED | FOREGROUND_INTENSITY);
     va_list args;

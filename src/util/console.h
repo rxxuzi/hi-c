@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 #include <stdarg.h>
+#include <windows.h>
 
 void c_R(const char *format, ...);
 void c_Y(const char *format, ...);
@@ -16,6 +17,12 @@ void c_G(const char *format, ...);
 void c_B(const char *format, ...);
 void c_M(const char *format, ...);
 void c_C(const char *format, ...);
+
+extern HANDLE console;
+extern COORD initialPosition;
+
+void initCursorPosition(void);
+void resetCursorPosition(void);
 
 #ifdef __cplusplus
 }

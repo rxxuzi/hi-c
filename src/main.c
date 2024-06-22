@@ -8,8 +8,8 @@
 #include "find/find.h"
 #include "path/path.h"
 #include "size/size.h"
+#include "stat/stat.h"
 #include "system.h"
-#include "util.h"
 #include <stdlib.h>
 
 void help() {
@@ -25,6 +25,7 @@ void help() {
     printf("  find      Find files or directories containing a specific term\n");
     printf("  path      Manage the system and user PATH variables\n");
     printf("  size      Get the size of a file or directory\n");
+    printf("  stat      Monitor system resources like RAM, CPU, Disk, and Heap usage\n");
     printf("  help      Show this help message\n");
     printf("  version   Show the current version of HI-C\n");
     printf("\n");
@@ -102,6 +103,15 @@ int main(int argc, char *argv[]) {
             } else {
                 size_help();
                 return -1;
+            }
+        }
+        else if (strcmp(argv[1], "stat") == 0) {
+            if (argc == 3 && strcmp(argv[2], "-h") == 0) {
+                stat_help();
+            } else if (argc == 3) {
+                stats(argc, argv);
+            } else {
+                stat_listen();
             }
         }
         else {

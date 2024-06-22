@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-double calc(const char *func);
+double eval(const char *func);
 void calcp(const char *func);
 void calc_help();
 

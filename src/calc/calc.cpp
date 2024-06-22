@@ -49,10 +49,9 @@ double evaluateExpression(const std::string& expression) {
     return result;
 }
 
-double calc(const char *func) {
+double eval(const char *func) {
     std::string expression(func);
 
-    // 演算の優先順位を考慮するために、まずべき乗を処理します
     std::istringstream iss(expression);
     std::ostringstream intermediateExpression;
     double currentNumber = 0;
@@ -83,7 +82,6 @@ double calc(const char *func) {
         intermediateExpression << tempResult;
     }
 
-    // 次に乗算と除算を処理します
     std::string intermediateExpressionStr = intermediateExpression.str();
     iss.clear();
     iss.str(intermediateExpressionStr);
@@ -129,6 +127,6 @@ double calc(const char *func) {
 }
 
 void calcp(const char *func) {
-    double y = calc(func);
+    double y = eval(func);
     c_G("Ans. %0.5f", y);
 }

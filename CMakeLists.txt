@@ -16,6 +16,8 @@ add_executable(hi-c
         src/util/io.c
         src/size/size.c
         src/stat/stat.c
+        src/util/secure/sha256.c
+        src/util/secure/fx.c
 )
 
 set_target_properties(hi-c PROPERTIES

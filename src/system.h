@@ -1,7 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#define HIC_VERSION "1.1.0"
+#define HIC_VERSION "1.1.1"
 
 #define HI_HASH 0x00
 #define HI_WDEX 0x01

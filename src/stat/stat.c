@@ -11,14 +11,14 @@
 #define REFRESH 200
 
 static int cpu_flag = 0;
-
+static int bar_length = 20;
 
 /*
  * style of :
  * 35% [#######................]
  */
 char* bar(ull total, ull used) {
-    int length = 20;
+    int length = bar_length;
     ull percent = (used * 100) / total;
     int filled = (int)(length * percent) / 100; // Correctly calculate number of filled positions
     int rest = length - filled;
@@ -136,19 +136,21 @@ int echo(){
 }
 
 void stat_help() {
-    c_B("Usage: stat [option]\n");
+    c_B("Usage: stat [options]\n");
     c_B("Options:\n");
     c_B("  --listen, -l        Listen mode: continuously displays system stats every %d ms.\n", REFRESH);
     c_B("                      Press Ctrl+C to exit this mode.\n");
-    c_B("  --all, -a           Display all system stats.\n");
-    c_B("  --ram               Display current RAM usage.\n");
+    c_B("  --all, -a           Display all system stats once.\n");
+    c_B("  --ram               Display current RAM usage immediately.\n");
     c_B("  --cpu               Display CPU usage. Note: CPU usage is measured over a short interval.\n");
-    c_B("  --disk              Display current disk usage.\n");
-    c_B("  --heap              Display current heap usage.\n");
+    c_B("  --disk              Display current disk usage immediately.\n");
+    c_B("  --heap              Display current heap usage immediately.\n");
+    c_B("  --len=<n>           Set the length of the status bar for some displays. Valid range: 5-100.\n");
+    c_B("                      Note: This option must be used in conjunction with other options.\n");
     c_B("\n");
-    c_B("Examples:\n");
-    c_B("  stat --cpu          Display the CPU usage immediately.\n");
-    c_B("  stat -l             Run in listen mode and continuously update system stats.\n");
+    c_B("Default behavior:\n");
+    c_B("  If no arguments are provided, the program starts in listen mode with a default status bar length of 20.\n");
+    c_B("\n");
 }
 
 int stat_listen() {
@@ -166,8 +168,22 @@ int stat_listen() {
 }
 
 int stats(int argc, char **argv) {
-    initCursorPosition();  // カーソルの初期位置を保存
+    if (argc == 2) {
+        stat_listen();
+    }
+    // search for "--len=n"
+    for (int i = 2; i < argc; i++) {
+        if (strncmp(argv[i], "--len=", 6) == 0) {
+            bar_length = atoi(argv[i] + 6);
+            if (bar_length < 5 || bar_length > 100) {
+                c_R("Invalid bar length %d. Using default value of 20.\n", bar_length);
+                bar_length = 20;
+            }
+            break;
+        }
+    }
 
+    initCursorPosition();
     for (int i = 2; i < argc; i++) {
         if (strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--listen") == 0) {
             stat_listen();
@@ -180,7 +196,7 @@ int stats(int argc, char **argv) {
         }
         else if (strcmp(argv[i], "--cpu") == 0) {
             cpu();
-            Sleep(250);  // 少し待ってから再度計測
+            Sleep(250);
             return cpu();
         }
         else if (strcmp(argv[i], "--disk") == 0) {

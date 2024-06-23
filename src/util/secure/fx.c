@@ -1,7 +1,8 @@
 // fx.c
-#include "security.h"
+#include "../security.h"
 #include <stdio.h>
 #include <stdlib.h>
+#define BUFFER_SIZE 2048
 
 int readFX(FILEX* fx) {
     FILE *file = fopen(fx->fileName, "rb");
@@ -15,7 +16,7 @@ int readFX(FILEX* fx) {
     long fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    fx->buffer = (Data *)malloc(fileSize);
+    fx->buffer = (unsigned char*)malloc(fileSize);
     if (!fx->buffer) {
         perror("Memory allocation failed.");
         fclose(file);

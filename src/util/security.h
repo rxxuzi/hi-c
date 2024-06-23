@@ -2,12 +2,9 @@
 #ifndef SECURITY_H
 #define SECURITY_H
 
-typedef unsigned char Data;
-#define BUFFER_SIZE 2048
-
 typedef struct {
     char *fileName;
-    Data *buffer;
+    unsigned char *buffer;
     unsigned int fileSize;
     char *hashStr;
     int status;

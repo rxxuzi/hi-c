@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "security.h"
+#include "../security.h"
 
 #define uchar unsigned char
 #define uint  unsigned int
@@ -138,26 +138,32 @@ void SHA256Final(SHA256_CTX *ctx, uchar hash[]) {
 }
 
 char* SHA256F(char *file_path) {
-    FILEX fx;
+    FILEX fx = {0};
     fx.fileName = file_path;
     if (readFX(&fx) != 0) {
+        return NULL;  // ファイル読み込みエラー
+    }
+
+    if (fx.fileSize == 0) {
+        freeFX(&fx);
         return NULL;
     }
+
     SHA256_CTX ctx;
     uchar hash[32];
     char* hashStr = (char*)malloc(65);
     if (!hashStr) {
+        freeFX(&fx);
         return NULL;
     }
-    hashStr[0] = '\0';
-
     SHA256Init(&ctx);
     SHA256Update(&ctx, fx.buffer, fx.fileSize);
     SHA256Final(&ctx, hash);
 
-    for(int i = 0; i < 32; i++) {
-        sprintf(&hashStr[i*2], "%02x", hash[i]);
+    for (int i = 0; i < 32; i++) {
+        sprintf(&hashStr[i * 2], "%02x", hash[i]);
     }
+    hashStr[64] = '\0';
 
     freeFX(&fx);
     return hashStr;

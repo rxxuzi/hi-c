@@ -9,6 +9,7 @@
 #include "path/path.h"
 #include "size/size.h"
 #include "stat/stat.h"
+#include "sync/sync.h"
 #include "system.h"
 #include <stdlib.h>
 
@@ -26,6 +27,7 @@ void help() {
     printf("  path      Manage the system and user PATH variables\n");
     printf("  size      Get the size of a file or directory\n");
     printf("  stat      Monitor system resources like RAM, CPU, Disk, and Heap usage\n");
+    printf("  sync      Backup, restore, and sync files across directories\n");
     printf("  help      Show this help message\n");
     printf("  version   Show the current version of HI-C\n");
     printf("\n");
@@ -34,7 +36,6 @@ void help() {
 }
 
 int main(int argc, char *argv[]) {
-
     if (argc == 1) {
         help();
         return 1;
@@ -98,6 +99,10 @@ int main(int argc, char *argv[]) {
             }
         }
         else if (strcmp(argv[1], "size") == 0) {
+            if (argc == 3 && strcmp(argv[2], "-h") == 0) {
+                size_help();
+                return 0;
+            }
             if (argc == 3) {
                 return size(argv[2]);
             } else {
@@ -108,10 +113,16 @@ int main(int argc, char *argv[]) {
         else if (strcmp(argv[1], "stat") == 0) {
             if (argc == 3 && strcmp(argv[2], "-h") == 0) {
                 stat_help();
-            } else if (argc == 3) {
-                stats(argc, argv);
+            } else  {
+                return stats(argc, argv);
+            }
+        }
+        else if (strcmp(argv[1], "sync") == 0) {
+            if (argc == 3 && strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0) {
+                sync_help();
+                return -1;
             } else {
-                stat_listen();
+                sync(argc, argv);
             }
         }
         else {

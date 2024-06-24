@@ -17,12 +17,15 @@ void c_G(const char *format, ...);
 void c_B(const char *format, ...);
 void c_M(const char *format, ...);
 void c_C(const char *format, ...);
+void c_W(const char *format, ...);
 
 extern HANDLE console;
 extern COORD initialPosition;
 
 void initCursorPosition(void);
 void resetCursorPosition(void);
+
+void c_Beep(int frequency, int duration);
 
 #ifdef __cplusplus
 }

@@ -3,9 +3,9 @@
 #define SYSTEM_H
 
 // hi-c version
-#define HIC_VERSION "1.3.0"
+#define HIC_VERSION "1.4.0"
 #define HIC_VERSION_MAJOR 1
-#define HIC_VERSION_MINOR 3
+#define HIC_VERSION_MINOR 4
 #define HIC_VERSION_PATCH 0
 
 #define HI_HASH 0x01000

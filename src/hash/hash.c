@@ -1,7 +1,7 @@
 // hash.c
 #include "../util.h"
 #include "hash.h"
-#include "../util/secure/security.h"
+#include "../util/security.h"
 
 void hash_help(void) {
     c_B("Usage: hash [option] <path>\n");
@@ -18,7 +18,6 @@ void hash(int argc, char **argv) {
         return;
     }
 
-    // もし、--strが入っているか--fileが入っているか精査する
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--str") == 0) {
             if (i + 1 < argc) {

@@ -84,3 +84,15 @@ void c_M(const char *format, ...) {
     del();
 }
 
+void c_W(const char *format, ...) {
+    set(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+    va_list args;
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+    del();
+}
+
+void c_Beep(int frequency, int duration) {
+    Beep(frequency, duration);
+}

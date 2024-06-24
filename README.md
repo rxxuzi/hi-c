@@ -13,6 +13,8 @@ Hi-C is a lightweight software suite implemented in C language that provides var
   - `delete`: Delete a path from the system PATH.
   - `print`: Print the current system PATH.
 - `size`: Get the size of a file or directory.
+- `stat`: Monitor system resources like RAM, CPU, Disk, and Heap usage
+- `bkup`: Backup, restore, and sync files across directories
 
 ## License
 

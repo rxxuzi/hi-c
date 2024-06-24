@@ -18,7 +18,7 @@ extern "C" {
 void sync_help();
 int sync(int argc, char **argv);
 int cache(char *dir);
-int diff(char *dir);
+int diff(char *src, char *dst);
 void restore(char *dir);
 int watch(char *dir);
 

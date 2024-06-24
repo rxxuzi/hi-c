@@ -1,5 +1,5 @@
 #include "sync.h"
-
+#include "flist.h"
 static bool create_directory(const char* dirName) {
     if (CreateDirectoryA(dirName, NULL)) {
         c_M("Directory created: %s\n", dirName);
@@ -86,9 +86,15 @@ void sync_help() {
     c_B("Options:\n");
     c_B("  -b, --backup <dir>          Backup the specified directory to the default backup location.\n");
     c_B("  -c, --cache <dir>           Create a cache of the specified directory.\n");
+    c_B("  -d, --diff [src] [dst]      Show differences between two directories or between cache and a directory.\n");
+    c_B("                             - If both src and dst are provided, compare these two directories.\n");
+    c_B("                             - If only dst is provided, compare it with the cached directory.\n");
+    c_B("                             - If no arguments are provided, compare the cached directory with the default backup location.\n");
+    c_B("  -l, --list                  List contents of the cached directory.\n");
     c_B("  -h, --help                  Show this help message and exit.\n");
     c_B("\n");
 }
+
 
 int sync(int argc, char **argv) {
     for (int i = 2; i < argc ; i ++ ){
@@ -96,14 +102,58 @@ int sync(int argc, char **argv) {
             char *src = argv[i + 1];
             if (create_directory(SYNC_DIR)) {
                 backup(src, SYNC_DIR);
-                cache(SYNC_DIR);
+                cache(src);
             }
         }
+        // cacheをとる。 -c <path>
         if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--cache") == 0) {
             char *dir = argv[i + 1];
             if (dir != NULL) {
-                cache(dir);
+                return cache(dir);
             }
+            return 1;
+        }
+
+        if (strcmp(argv[i],"-d") == 0 || strcmp(argv[i], "--diff") == 0) {
+            c_M("[+] for Add: File exists in source but not in destination.\n");
+            c_M("[-] for Delete: File exists in destination but not in source.\n");
+            c_M("[!] for Modify: File exists in both but is different.\n");
+            if (i + 3 == argc) {
+                // -d <src> <dct>
+                char *src = argv[i + 1];
+                char *dct = argv[i + 2];
+                if (src == NULL || dct == NULL) {
+                    c_R("Invalid arguments for -d option.\n");
+                    return 1;
+                }
+                diff(src, dct);
+            } else if (i + 2 == argc){
+                // -d cache内にあるsrcと指定のディレクトリ
+                FLIST *src = readFlist(SYNC_CACHE);
+                diff(src->src, argv[i + 1]);
+            } else {
+                // -d cacheとデフォルトディレクトリの差分
+                FLIST *tmp = readFlist(SYNC_CACHE);
+                diff(tmp->src, SYNC_DIR);
+            }
+            return 0;
+        }
+
+        if (strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--list") == 0) {
+            FLIST *tmp = readFlist(SYNC_CACHE);
+            showFLIST(tmp);
+            freeFLIST(tmp);
+            return 0;
+        }
+
+        if(strcmp(argv[i], "-r") == 0 || strcmp(argv[i], "--restore") == 0) {
+            // TODO: Implement restore functionality
+            return 0;
+        }
+
+        if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+            sync_help();
+            return 0;
         }
     }
     return 0;

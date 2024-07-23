@@ -28,6 +28,7 @@ add_executable(hi-c
         src/sync/cache.c
         src/sync/flist.c
         src/sync/diff.c
+        src/open/open.c
 )
 
 set_target_properties(hi-c PROPERTIES

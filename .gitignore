@@ -67,3 +67,4 @@ test/
 hi-c.backup/
 *.cache
 *.hi-c
+/asm/

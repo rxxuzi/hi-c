@@ -10,6 +10,7 @@
 #include "size/size.h"
 #include "stat/stat.h"
 #include "sync/sync.h"
+#include "open/open.h"
 #include "system.h"
 #include <stdlib.h>
 
@@ -28,6 +29,7 @@ void help() {
     printf("  size      Get the size of a file or directory\n");
     printf("  stat      Monitor system resources like RAM, CPU, Disk, and Heap usage\n");
     printf("  sync      Backup, restore, and sync files across directories\n");
+    printf("  open      Open specified directories in Windows Explorer\n");
     printf("  help      Show this help message\n");
     printf("  version   Show the current version of HI-C\n");
     printf("\n");
@@ -125,6 +127,15 @@ int main(int argc, char *argv[]) {
                 sync(argc, argv);
             }
         }
+
+        else if (strcmp(argv[1], "open") == 0) {
+            if (argc == 3 && strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0) {
+                open_help();
+            } else  {
+                return open_dir(argc, argv);
+            }
+        }
+
         else {
             c_R("Invalid command\n");
             c_M("Type \"%s -h\" for help\n", argv[0]);

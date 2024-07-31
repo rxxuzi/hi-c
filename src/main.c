@@ -105,12 +105,10 @@ int main(int argc, char *argv[]) {
                 size_help();
                 return 0;
             }
-            if (argc == 3) {
-                return size(argv[2]);
-            } else {
-                size_help();
-                return -1;
+            if (argc >= 3) {
+                return size(argc,argv);
             }
+            return -1;
         }
         else if (strcmp(argv[1], "stat") == 0) {
             if (argc == 3 && strcmp(argv[2], "-h") == 0) {

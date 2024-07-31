@@ -5,5 +5,6 @@
 #include "util/fis.h"
 int getFullPath(const char *path, char *fullPath, size_t size);
 char* getFileSize(long size);
+char* getFileSize64(long long size);
 
 #endif //UTIL_H

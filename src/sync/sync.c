@@ -21,18 +21,25 @@ int copy_file(const char* src, const char* dst) {
     int success = 0;
 
     HANDLE hSrc = CreateFileA(src, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    HANDLE hDst = CreateFileA(dst, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hSrc == INVALID_HANDLE_VALUE) {
+        c_R("Failed to open source file: %s. Error: %lu\n", src, GetLastError());
+        return 0;
+    }
 
-    if (hSrc != INVALID_HANDLE_VALUE && hDst != INVALID_HANDLE_VALUE) {
-        while (ReadFile(hSrc, buffer, BUFFER_SIZE, &bytesRead, NULL) && bytesRead > 0) {
-            if (!WriteFile(hDst, buffer, bytesRead, &bytesWritten, NULL) || bytesRead != bytesWritten) {
-                c_R("Error writing to file: %s\n", dst);
-                break;
-            }
+    HANDLE hDst = CreateFileA(dst, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hDst == INVALID_HANDLE_VALUE) {
+        c_R("Failed to create destination file: %s. Error: %lu\n", dst, GetLastError());
+        CloseHandle(hSrc);
+        return 0;
+    }
+
+    while (ReadFile(hSrc, buffer, BUFFER_SIZE, &bytesRead, NULL) && bytesRead > 0) {
+        if (!WriteFile(hDst, buffer, bytesRead, &bytesWritten, NULL) || bytesRead != bytesWritten) {
+            c_R("Error writing to file: %s. Error: %lu\n", dst, GetLastError());
+            success = 0;
+            break;
         }
         success = 1;
-    } else {
-        c_R("Failed to open source or destination file. Error: %lu\n", GetLastError());
     }
 
     CloseHandle(hSrc);
@@ -90,11 +97,17 @@ void sync_help() {
     c_B("                             - If both src and dst are provided, compare these two directories.\n");
     c_B("                             - If only dst is provided, compare it with the cached directory.\n");
     c_B("                             - If no arguments are provided, compare the cached directory with the default backup location.\n");
+    c_B("  -r, --restore [dir]         Restore files from the backup. If [dir] is specified,\n");
+    c_B("                              restore to that directory. Otherwise, restore to the original location.\n");
     c_B("  -l, --list                  List contents of the cached directory.\n");
+    c_B("  -x, --cleanup               Remove the backup directory and cache file.\n");
     c_B("  -h, --help                  Show this help message and exit.\n");
     c_B("\n");
+    c_B("Directory Information:\n");
+    c_B("  Backup Directory:           " SYNC_DIR "\n");
+    c_B("  Cache File:                 " SYNC_CACHE "\n");
+    c_B("\n");
 }
-
 
 int sync(int argc, char **argv) {
     for (int i = 2; i < argc ; i ++ ){
@@ -146,9 +159,24 @@ int sync(int argc, char **argv) {
             return 0;
         }
 
-        if(strcmp(argv[i], "-r") == 0 || strcmp(argv[i], "--restore") == 0) {
-            // TODO: Implement restore functionality
-            return 0;
+        if (strcmp(argv[2], "-r") == 0 || strcmp(argv[2], "--restore") == 0) {
+            if (argc > 3) {
+                return restore(argv[3]);
+            } else {
+                // キャッシュファイルから元のディレクトリを取得して使用
+                FLIST *cacheList = readFlist(SYNC_CACHE);
+                if (!cacheList) {
+                    c_R("Failed to read cache file.\n");
+                    return EXIT_FAILURE;
+                }
+                int result = restore(cacheList->src);
+                freeFLIST(cacheList);
+                return result;
+            }
+        }
+
+        if (strcmp(argv[2], "-x") == 0 || strcmp(argv[2], "--cleanup") == 0) {
+            return cleanup();
         }
 
         if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {

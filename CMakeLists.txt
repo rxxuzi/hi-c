@@ -30,6 +30,8 @@ add_executable(hi-c
         src/sync/diff.c
         src/open/open.c
         src/util/io64.c
+        src/sync/restore.c
+        src/sync/cleanup.c
 )
 
 set_target_properties(hi-c PROPERTIES

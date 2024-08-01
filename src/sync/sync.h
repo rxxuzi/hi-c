@@ -19,9 +19,9 @@ void sync_help();
 int sync(int argc, char **argv);
 int cache(char *dir);
 int diff(char *src, char *dst);
-void restore(char *dir);
-int watch(char *dir);
-
+int copy_file(const char* src, const char* dst);
+int restore(const char *targetDir);
+int cleanup();
 #ifdef __cplusplus
 }
 #endif

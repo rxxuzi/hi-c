@@ -118,6 +118,10 @@ int main(int argc, char *argv[]) {
             }
         }
         else if (strcmp(argv[1], "sync") == 0) {
+            if ( argc < 3) {
+                sync_help();
+                return -1;
+            }
             if (argc == 3 && strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0) {
                 sync_help();
                 return -1;

@@ -167,41 +167,78 @@ void path_help() {
     c_B("  -a, --add [path]      Add a specified path to the PATH environment variable.\n");
     c_B("      -s, --system      Use this flag with '-a' to add to the system PATH.\n");
     c_B("      -u, --user        Use this flag with '-a' to add to the user PATH. This is the default behavior.\n");
+    c_B("  -c, --current         Add the current directory to the PATH (user PATH by default).\n");
+    c_B("      -s, --system      Use this flag with '-c' to add to the system PATH.\n");
     c_B("  -d, --delete [path]   Delete a specified path from the PATH environment variable.\n");
     c_B("      -s, --system      Use this flag with '-d' to delete from the system PATH.\n");
     c_B("      -u, --user        Use this flag with '-d' to delete from the user PATH. This is the default behavior.\n");
     c_B("  -p, --print           Print the current PATH. Uses mode flags '-s' or '-u' to select between system or user PATH.\n");
     c_B("  -h, --help            Show this help message and exit.\n");
+    c_B("\n");
+    c_B("Examples:\n");
+    c_B("  hi-c path -a -u ./    Add the current directory to the user PATH\n");
+    c_B("  hi-c path -c          Add the current directory to the user PATH (equivalent to above)\n");
+    c_B("  hi-c path -c -s       Add the current directory to the system PATH\n");
 }
 
 
 int path(int argc, char *argv[]) {
-    if (argc > 2) {
-        int mode = MODE_USER;
-        for (int i = 2; i < argc; i++) {
-            if (strcmp(argv[i + 1], "-s") == 0 || strcmp(argv[i + 1], "--system") == 0) {
-                mode = MODE_SYSTEM;
-                break;
-            } else if (strcmp(argv[i + 1], "-u") == 0 || strcmp(argv[i + 1], "--user") == 0) {
-                mode = MODE_USER;
-                break;
-            }
-        }
+    int mode = MODE_USER;
+    char *target_path = NULL;
+    int action = 0; // 0: no action, 1: add, 2: delete, 3: print, 4: add current
 
-        for (int i = 2; i < argc; i++) {
-            if (strcmp(argv[i], "-a") == 0 || strcmp(argv[i], "--add") == 0) {
-                return apth(argv[i + 1], mode);
-            } else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--delete") == 0) {
-                return dpth(argv[i + 1], mode);
-            } else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--print") == 0) {
-                return ppth(mode);
-            } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
-                path_help();
-                return 0;
-            }
+    // Parse arguments
+    for (int i = 2; i < argc; i++) {
+        if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--system") == 0) {
+            mode = MODE_SYSTEM;
+        } else if (strcmp(argv[i], "-u") == 0 || strcmp(argv[i], "--user") == 0) {
+            mode = MODE_USER;
+        } else if (strcmp(argv[i], "-a") == 0 || strcmp(argv[i], "--add") == 0) {
+            action = 1;
+        } else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--delete") == 0) {
+            action = 2;
+        } else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--print") == 0) {
+            action = 3;
+        } else if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--current") == 0) {
+            action = 4;
+        } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+            path_help();
+            return 0;
+        } else if (target_path == NULL) {
+            target_path = argv[i];
         }
-        c_R("Invalid option.\n");
-        path_help();
-        return -1;
+    }
+
+    // Execute the appropriate action
+    switch (action) {
+        case 1: // add
+            if (target_path == NULL) {
+                c_R("Error: No path specified for add operation.\n");
+                path_help();
+                return -1;
+            }
+            return apth(target_path, mode);
+        case 2: // delete
+            if (target_path == NULL) {
+                c_R("Error: No path specified for delete operation.\n");
+                path_help();
+                return -1;
+            }
+            return dpth(target_path, mode);
+        case 3: // print
+            return ppth(mode);
+        case 4: // add current
+        {
+            char current_dir[MAX_PATH];
+            if (GetCurrentDirectory(MAX_PATH, current_dir) == 0) {
+                c_R("Error: Unable to get current directory.\n");
+                return -1;
+            }
+            return apth(current_dir, mode);
+        }
+        default:
+            c_R("Error: No valid action specified.\n");
+            path_help();
+            return -1;
     }
 }
